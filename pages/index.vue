@@ -2,14 +2,17 @@
 </script>
 
 <template>
-  <div class="flex flex-col justify-center items-center w-full border h-full">
-    <UButton
-      label="Tema Değiştir"
-      :icon="isDark ? 'lucide:sun' : 'lucide:moon'"
-      @click="toggleTheme"
-    />
-    <div class="text-primary-400 transition-all duration-300">
-      ATLAS
+  <div class="h-screen">
+    <div class="flex justify-end mr-4">
+      <UButton
+        class="py-3 font-bold bg-orange-400 hover:bg-slate-400 mt-5"
+        label="Change Theme"
+        :icon="isDark ? 'lucide:sun' : 'lucide:moon'"
+        @click="toggleTheme"
+      />
+    </div>
+    <div class="mt-50">
+      <todo-user-list />
     </div>
   </div>
 </template>
