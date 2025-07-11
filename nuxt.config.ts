@@ -1,6 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-05-15',
+  modules: [
+    '@pinia/nuxt',
+    '@nuxt/ui',
+    '@nuxt/fonts',
+  ],
   devtools: { enabled: true },
-  modules: ['@nuxt/fonts', '@pinia/nuxt'],
+  css: ['./assets/main.css'],
+
 })

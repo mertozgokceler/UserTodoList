@@ -1,3 +1,7 @@
+<script setup lang="ts">
+definePageMeta({})
+</script>
+
 <template>
   <UApp>
     <NuxtLayout>
