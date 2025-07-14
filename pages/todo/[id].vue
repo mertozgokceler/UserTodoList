@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import { useUserStore } from '~/stores/storage'
 
 definePageMeta({
-  layout: false,
+  layout: 'detay-sayfa',
   name: 'todo-id',
 })
 
@@ -25,5 +25,5 @@ const kisiler = computed(() => userStore.kullanicilar.find(g => g.id === id))
 </script>
 
 <template>
-  <div>mert</div>
+
 </template>
