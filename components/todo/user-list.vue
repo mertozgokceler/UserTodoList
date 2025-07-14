@@ -1,16 +1,118 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { User } from '~/types'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '~/stores/storage'
+
+const userStore = useUserStore()
+const silinecekKisi = ref<User | null>(null)
+const removeModalIsOpen = ref<boolean>(false)
+const router = useRouter()
+
+function detayaGit(user: User) {
+  router.push({
+    name: 'todo-id',
+    params: { id: String(user.id) },
+  })
+}
+
+function getUsers() {
+  userStore.fetchUsers()
+}
+
+function deleteUsers() {
+  userStore.clearUsers()
+}
+
+function silModalAc(user: User) {
+  silinecekKisi.value = user
+  removeModalIsOpen.value = true
+}
+
+function silOnayla() {
+  if (silinecekKisi.value)
+    userStore.sil(silinecekKisi.value.id)
+  removeModalIsOpen.value = false
+}
+
+onMounted(() => {
+  if (userStore.kullanicilar.length === 0) {
+    userStore.fetchUsers()
+  }
+})
+</script>
 
 <template>
-  <div class="flex justify-center items-center -mt-20 font-bold">
-    <label >
-    Aşağıdaki Buton İle Kullanıcıları Listeleyebilirsiniz !
-    </label>
-   </div>
-  <div class="flex justify-center items-center">
-    <UButton
-      class="py-5 font-bold bg-orange-400 hover:bg-slate-400 mt-10 w-50 flex justify-center items-center"
-      icon="lucide:refresh-ccw"
-      label="Kullanıcıları Getir"
-    />
+  <div class="flex flex-col items-center justify-center w-full gap-6 mt-4">
+    <div class="font-bold text-center text-lg text-slate-800 dark:text-white">
+      Aşağıdaki Buton ile Kullanıcıları Listeleyebilirsiniz!
+    </div>
+
+    <div class="flex gap-2">
+      <UButton
+        class="py-4 font-bold bg-orange-400 hover:bg-slate-400 w-44 flex justify-center items-center hover:ring-3 hover:ring-sky-500 transition-all duration-300"
+        icon="lucide:refresh-ccw"
+        label="Kullanıcıları Getir"
+        @click="getUsers"
+      />
+      <UButton
+        color="error"
+        class="py-4 font-bold hover:bg-slate-400 w-44 flex justify-center items-center hover:ring-3 hover:ring-sky-500 transition-all duration-300"
+        icon="lucide:trash"
+        label="Tüm Kullanıcıları Sil"
+        @click="deleteUsers"
+      />
+    </div>
+
+    <div class="mt-4 w-full max-w-3xl">
+      <ul class="w-full space-y-3">
+        <li
+          v-for="(kullanici, index) in userStore.kullanicilar"
+          :key="index"
+          class="w-full flex justify-between items-center transition-all duration-300 bg-slate-400 text-black font-bold px-4 py-5 rounded hover:shadow-lg hover:bg-purple-500 hover:scale-105"
+        >
+          <span>{{ kullanici.name }}</span>
+          <span class="text-sm italic">{{ kullanici.mail }}</span>
+          <div class="flex gap-2 ml-4">
+            <UButton
+              icon="i-lucide-x" size="md" color="error" variant="solid"
+              class="text-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition duration-300"
+              @click="silModalAc(kullanici)"
+            />
+            <UButton
+              icon="i-lucide-eye" size="md" color="success" variant="solid"
+              class="text-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition duration-300"
+              @click="detayaGit(kullanici)"
+            />
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
+  <UModal
+    v-model:open="removeModalIsOpen"
+    title="Kişiyi Silmek Üzeresiniz"
+    :description="`“${silinecekKisi?.name || 'Kişi Bulunamadı'}” adlı kişiyi silmek istediğinize emin misiniz?`"
+    :ui="{
+      footer: 'flex justify-end space-x-3 mt-4',
+    }"
+  >
+    <template #footer>
+      <UButton
+        label="Vazgeç"
+        color="neutral"
+        variant="outline"
+        class="px-5"
+        @click="removeModalIsOpen = false"
+      />
+      <UButton
+        icon="i-lucide-trash"
+        label="Sil"
+        color="error"
+        variant="solid"
+        class="px-6"
+        @click="silOnayla"
+      />
+    </template>
+  </UModal>
 </template>

@@ -37,10 +37,50 @@ export const useTaskStore = defineStore('todo', () => {
   return { gorevler, ekle, sil, deleteAll }
 })
 
-export const userStore = defineStore('user', () => {
+// ------------------------------------------------------------------------------------------------------------------------------------------------
+
+export const useUserStore = defineStore('user', () => {
   const kullanicilar = ref<User[]>([])
 
-  function getNextId(): number {
-    return kullanicilar.value.length ? Math.max(...kullanicilar.value.map(g => g.id)) + 1 : 0
+  async function fetchUsers() {
+    if (typeof window === 'undefined')
+      return
+
+    // Eğer localStorage'ta varsa, onu yükle
+    const stored = localStorage.getItem('kullanicilar')
+    if (stored) {
+      kullanicilar.value = JSON.parse(stored) as User[]
+      return
+    }
+
+    // Yoksa API'den çek
+    try {
+      const { data, error } = await useFetch<User[]>('https://my-json-server.typicode.com/mertozgokceler/testserver/posts', {
+        server: false,
+      })
+
+      if (data.value) {
+        kullanicilar.value = data.value
+        localStorage.setItem('kullanicilar', JSON.stringify(kullanicilar.value))
+      }
+      else if (error.value) {
+        console.error('Kullanıcı verisi çekilemedi:', error.value)
+      }
+    }
+    catch (err) {
+      console.error('Hata oluştu:', err)
+    }
   }
+
+  function clearUsers() {
+    kullanicilar.value = []
+    localStorage.removeItem('kullanicilar')
+  }
+
+  function sil(index: number) {
+    kullanicilar.value.splice(index, 1)
+    localStorage.setItem('kullanicilar', JSON.stringify(kullanicilar.value))
+  }
+
+  return { kullanicilar, fetchUsers, clearUsers, sil }
 })
