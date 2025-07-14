@@ -46,14 +46,13 @@ export const useUserStore = defineStore('user', () => {
     if (typeof window === 'undefined')
       return
 
-    // Eğer localStorage'ta varsa, onu yükle
     const stored = localStorage.getItem('kullanicilar')
     if (stored) {
       kullanicilar.value = JSON.parse(stored) as User[]
       return
     }
 
-    // Yoksa API'den çek
+
     try {
       const { data, error } = await useFetch<User[]>('https://my-json-server.typicode.com/mertozgokceler/testserver/posts', {
         server: false,
