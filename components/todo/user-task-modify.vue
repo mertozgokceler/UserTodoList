@@ -6,6 +6,7 @@ const router = useRouter()
 const store = useTaskStore()
 const silinecekGorev = ref<Todo | null>(null)
 const removeModalIsOpen = ref<boolean>(false)
+const toast = useToast()
 
 function todoDetayaGit(todo: Todo) {
   router.push({
@@ -98,7 +99,10 @@ function formatTarih(tarih: string): string {
         color="error"
         variant="solid"
         class="px-6"
-        @click="silOnayla"
+        @click="() => {
+          silOnayla()
+          toast.add({ title: 'İlgili Görev Başarıyla Silindi' })
+        }"
       />
     </template>
   </UModal>

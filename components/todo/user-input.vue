@@ -1,13 +1,23 @@
 <script setup lang="ts">
-const value = ref('')
 const store = useTaskStore()
 const gorev = ref('')
+const removeModalIsOpen = ref<boolean>(false)
+const toast = useToast()
 
 function gorevEkle() {
   if (gorev.value.trim()) {
     store.ekle(gorev.value)
     gorev.value = ''
   }
+}
+
+function silModalAc() {
+  removeModalIsOpen.value = true
+}
+
+function hepsiniSil() {
+  store.gorevler = []
+  removeModalIsOpen.value = false
 }
 </script>
 
@@ -16,7 +26,9 @@ function gorevEkle() {
     v-model="gorev"
     placeholder="Görev Giriniz :"
     :ui="{ trailing: 'pe-1' }"
-    class="mt-7 w-100 text-left border placeholder:font-semibold font-semibold shadow-xl/30 shadow-white rounded hover:ring-2 hover:ring-orange-500 transition-all duration-300 dark:text-white"
+    class="mt-7 w-100 text-left border placeholder:font-semibold font-semibold
+         shadow-xl shadow-black/40 dark:shadow-white rounded
+         hover:ring-2 hover:ring-orange-500 transition-all duration-300 dark:text-white"
   >
     <template v-if="gorev?.length" #trailing>
       <UButton
@@ -25,7 +37,7 @@ function gorevEkle() {
         size="xl"
         icon="i-lucide-circle-x"
         aria-label="Clear input"
-        @click="value = ''"
+        @click="gorev = ''"
       />
     </template>
   </UInput>
@@ -40,11 +52,40 @@ function gorevEkle() {
     <UButton
       icon="i-lucide-trash" size="md" color="error" variant="solid"
       class="text-black px-4 py-3 font-bold rounded hover:bg-amber-50 hover:ring-2 hover:ring-orange-500 transition-all duration-300"
-      @click="store.deleteAll()"
+      @click="silModalAc"
     >
       Hepsini Sil
     </UButton>
   </div>
+  <UModal
+    v-model:open="removeModalIsOpen"
+    title="Tüm Görevleri Silmek Üzeresiniz"
+    description=" Tüm görevleri silmek istediğinize emin misiniz?"
+    :ui="{
+      footer: 'flex justify-end space-x-3 mt-4',
+    }"
+  >
+    <template #footer>
+      <UButton
+        label="Vazgeç"
+        color="neutral"
+        variant="outline"
+        class="px-5"
+        @click="removeModalIsOpen = false"
+      />
+      <UButton
+        icon="i-lucide-trash"
+        label="Sil"
+        color="error"
+        variant="solid"
+        class="px-6"
+        @click="() => {
+          hepsiniSil()
+          toast.add({ title: 'Tüm Görevler Başarıyla Silindi' })
+        }"
+      />
+    </template>
+  </UModal>
   <div class="mt-2 w-96">
     <slot />
   </div>

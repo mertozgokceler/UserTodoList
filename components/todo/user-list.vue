@@ -9,6 +9,7 @@ const silinecekKisi = ref<User | null>(null)
 const removeModalIsOpen = ref<boolean>(false)
 const removeModalIsOpenAll = ref<boolean>(false)
 const router = useRouter()
+const toast = useToast()
 
 function detayaGit(user: User) {
   router.push({
@@ -36,8 +37,10 @@ function silModalAc(user: User) {
 }
 
 function silOnayla() {
-  if (silinecekKisi.value)
+  if (silinecekKisi.value) {
     userStore.sil(silinecekKisi.value.uuid)
+    toast.add({ title: `${silinecekKisi.value.name} adlı kullanıcı silindi.` })
+  }
   removeModalIsOpen.value = false
 }
 
@@ -140,12 +143,15 @@ onMounted(() => {
         @click="removeModalIsOpenAll = false"
       />
       <UButton
-        icon="i-lucide-trash"
+        icon="lucide-trash"
         label="Sil"
         color="error"
         variant="solid"
         class="px-6"
-        @click="deleteUsers"
+        @click="() => {
+          deleteUsers()
+          toast.add({ title: 'Tüm Kullanıcılar Başarıyla Silindi' })
+        }"
       />
     </template>
   </UModal>
