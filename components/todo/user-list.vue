@@ -21,13 +21,13 @@ function getUsers() {
   userStore.fetchUsers()
 }
 
-function silModalAcAll(){
-    removeModalIsOpenAll.value=true
+function silModalAcAll() {
+  removeModalIsOpenAll.value = true
 }
 
 function deleteUsers() {
-      userStore.clearUsers()
-      removeModalIsOpenAll.value = false
+  userStore.clearUsers()
+  removeModalIsOpenAll.value = false
 }
 
 function silModalAc(user: User) {
@@ -37,7 +37,7 @@ function silModalAc(user: User) {
 
 function silOnayla() {
   if (silinecekKisi.value)
-    userStore.sil(silinecekKisi.value.id)
+    userStore.sil(silinecekKisi.value.uuid)
   removeModalIsOpen.value = false
 }
 
@@ -73,13 +73,13 @@ onMounted(() => {
     <div class="mt-4 w-full max-w-3xl">
       <ul class="w-full space-y-3">
         <li
-          v-for="(kullanici, index) in userStore.kullanicilar"
-          :key="index"
+          v-for="kullanici in userStore.kullanicilar"
+          :key="kullanici.uuid"
           class="w-full flex justify-between items-center transition-all duration-300 bg-slate-400 text-black font-bold px-4 py-5 rounded hover:shadow-lg hover:bg-purple-500 hover:scale-105"
         >
           <span><UAvatar :alt="kullanici.name" size="md" /></span>
           <span class="-ml-2 flex justify-center items-center">{{ kullanici.name }}</span>
-          <span class="text-sm italic">{{ kullanici.mail }}</span>
+          <span class="text-sm italic">{{ kullanici.email }}</span>
           <div class="flex gap-2 ml-4">
             <UButton
               icon="i-lucide-trash" size="md" color="error" variant="solid"
@@ -123,10 +123,10 @@ onMounted(() => {
     </template>
   </UModal>
 
-   <UModal
+  <UModal
     v-model:open="removeModalIsOpenAll"
     title="Tüm Kişileri Silmek Üzeresiniz"
-    :description="`Tüm Kişileri Silmek İstediğinize Emin Misiniz ?`"
+    description="Tüm Kişileri Silmek İstediğinize Emin Misiniz ?"
     :ui="{
       footer: 'flex justify-end space-x-3 mt-4',
     }"

@@ -41,26 +41,37 @@ export const useTaskStore = defineStore('todo', () => {
 
 export const useUserStore = defineStore('user', () => {
   const kullanicilar = ref<User[]>([])
+  const config = useRuntimeConfig()
+  const userKey = config.public.localStorageKeys.users
 
   async function fetchUsers() {
     if (typeof window === 'undefined')
       return
 
-    const stored = localStorage.getItem('kullanicilar')
+    const config = useRuntimeConfig()
+    const userKey = config.public.localStorageKeys.users
+
+    const stored = localStorage.getItem(userKey)
     if (stored) {
-      kullanicilar.value = JSON.parse(stored) as User[]
+      kullanicilar.value = JSON.parse(stored)
       return
     }
 
-
     try {
-      const { data, error } = await useFetch<User[]>('https://my-json-server.typicode.com/mertozgokceler/testserver/posts', {
+      const { data, error } = await useFetch<User[]>('https://mockly.atlaxt.me/api/users', {
         server: false,
       })
 
       if (data.value) {
-        kullanicilar.value = data.value
-        localStorage.setItem('kullanicilar', JSON.stringify(kullanicilar.value))
+        const uuidUsers = await Promise.all(
+          data.value.map(async (user) => {
+            const uuid = await $fetch<string>('https://mockly.atlaxt.me/api/uuid')
+            return { ...user, uuid }
+          }),
+        )
+
+        kullanicilar.value = uuidUsers
+        localStorage.setItem(userKey, JSON.stringify(kullanicilar.value))
       }
       else if (error.value) {
         console.error('Kullanıcı verisi çekilemedi:', error.value)
@@ -73,12 +84,12 @@ export const useUserStore = defineStore('user', () => {
 
   function clearUsers() {
     kullanicilar.value = []
-    localStorage.removeItem('kullanicilar')
+    localStorage.removeItem(userKey)
   }
 
-  function sil(index: number) {
-    kullanicilar.value.splice(index, 1)
-    localStorage.setItem('kullanicilar', JSON.stringify(kullanicilar.value))
+  function sil(uuid: string) {
+    kullanicilar.value = kullanicilar.value.filter(user => user.uuid !== uuid)
+    localStorage.setItem(userKey, JSON.stringify(kullanicilar.value))
   }
 
   return { kullanicilar, fetchUsers, clearUsers, sil }

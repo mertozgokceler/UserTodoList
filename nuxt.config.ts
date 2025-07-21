@@ -8,4 +8,11 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['./assets/main.css'],
 
+  runtimeConfig: {
+    public: {
+      localStorageKeys: {
+        users: 'kullanicilar',
+      },
+    },
+  },
 })

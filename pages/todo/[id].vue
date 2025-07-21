@@ -3,27 +3,35 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '~/stores/storage'
 
-definePageMeta({
-  layout: 'detay-sayfa',
-  name: 'todo-id',
-})
-
+const store = useTaskStore()
 const route = useRoute()
 const userStore = useUserStore()
 const id = Number(route.params.id)
 
+const _kisiler = computed(() => userStore.kullanicilar.find(g => g.id === id))
+definePageMeta({
+  name: 'todo-id',
+})
+
+const storageKey = `gorevler_${id}`
+
 onMounted(() => {
-  if (userStore.kullanicilar.length === 0) {
-    const veriler = localStorage.getItem('kullanicilar')
-    if (veriler) {
-      userStore.kullanicilar = JSON.parse(veriler)
-    }
+  const saved = localStorage.getItem(storageKey)
+  if (saved) {
+    store.gorevler = JSON.parse(saved)
   }
 })
 
-const kisiler = computed(() => userStore.kullanicilar.find(g => g.id === id))
+watch(() => store.gorevler, (newVal) => {
+  localStorage.setItem(storageKey, JSON.stringify(newVal))
+}, { deep: true })
 </script>
 
 <template>
-
+  <div class="flex flex-col items-center gap-6">
+    <TodoUserInput />
+  </div>
+  <div class="mt-4">
+    <TodoUserTaskModify />
+  </div>
 </template>
