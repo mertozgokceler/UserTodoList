@@ -3,6 +3,18 @@ const store = useTaskStore()
 const gorev = ref('')
 const removeModalIsOpen = ref<boolean>(false)
 const toast = useToast()
+const route = useRoute()
+const userStore = useUserStore()
+const id = Number(route.params.id)
+
+const user = computed(() =>
+  userStore.kullanicilar.find(u => u.id === id),
+)
+
+onMounted(async () => {
+  if (userStore.kullanicilar.length === 0)
+    await userStore.fetchUsers()
+})
 
 function gorevEkle() {
   if (gorev.value.trim()) {
@@ -22,12 +34,15 @@ function hepsiniSil() {
 </script>
 
 <template>
+  <div v-if="user" class="font-semibold text-zinc-900 dark:text-white scale-125 flex justify-center items-center">
+    Merhaba , {{ user.name }}
+  </div>
   <UInput
     v-model="gorev"
     placeholder="Görev Giriniz :"
     :ui="{ trailing: 'pe-1' }"
-    class="mt-7 w-100 text-left border placeholder:font-semibold font-semibold
-         shadow-xl shadow-black/40 dark:shadow-white rounded
+    class="mt-7 w-120 h-full max-w-2xl text-left border placeholder:font-semibold font-semibold
+         shadow-xl shadow-black/40 dark:shadow-white rounded light:shadow-black
          hover:ring-2 hover:ring-orange-500 transition-all duration-300 dark:text-white"
   >
     <template v-if="gorev?.length" #trailing>

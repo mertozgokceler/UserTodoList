@@ -5,23 +5,26 @@
     <title>TodoList | By Mert</title>
   </Head>
 
-  <div class="min-h-screen flex flex-col text-white">
-    <div class="w-full p-5 rounded flex justify-center items-center bg-sky-500 -mt-1">
-      <div class="ml-4">
+  <div class="h-screen flex flex-col text-white dark:bg-zinc-600 light:bg-zinc-300">
+    <div class="w-full p-9 bg-sky-500 flex items-center relative">
+      <div class="absolute left-4 flex items-center">
         <img
           src="~/assets/icontodo.png"
           alt="İcon Bulunamadı"
-          class="w-20 h-20 object-contain"
+          class="w-25 h-25 object-contain"
         >
       </div>
 
       <h1
-        class="text-3xl font-bold text-red-50 text-center flex-1 justify-center items-center ml-10"
+        class="mx-auto text-3xl font-bold text-white"
         style="font-family: Pacifico, cursive;"
       >
         ToDoList | Mert Özgökçeler
       </h1>
-      <TodoHeader />
+
+      <div class="absolute right-4 flex items-center space-x-3">
+        <TodoHeader />
+      </div>
     </div>
 
     <main class="flex-1 overflow-auto p-4">

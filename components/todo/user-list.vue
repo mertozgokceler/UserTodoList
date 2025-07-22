@@ -83,18 +83,38 @@ onMounted(() => {
           <span><UAvatar :alt="kullanici.name" size="md" /></span>
           <span class="-ml-2 flex justify-center items-center">{{ kullanici.name }}</span>
           <span class="text-sm italic">{{ kullanici.email }}</span>
-          <div class="flex gap-2 ml-4">
+
+          <UDropdownMenu
+            :items="[
+              {
+                label: 'Detaya Git',
+                icon: 'i-lucide-eye',
+                onClick: () => detayaGit(kullanici),
+                class: 'bg-green-500 font-semibold',
+              },
+              {
+                label: 'Sil',
+                icon: 'i-lucide-trash',
+                onClick: () => silModalAc(kullanici),
+                class: 'bg-red-400 font-semibold',
+
+              },
+            ]"
+            :content="{
+              align: 'end',
+              side: 'bottom',
+              sideOffset: 8,
+            }"
+            :ui="{ content: 'w-48' }"
+          >
             <UButton
-              icon="i-lucide-trash" size="md" color="error" variant="solid"
-              class="text-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition duration-300"
-              @click="silModalAc(kullanici)"
+              color="neutral"
+              variant="solid"
+              class="rounded-full"
+              label="Seçenekler"
+              icon="i-lucide-more-horizontal"
             />
-            <UButton
-              icon="i-lucide-eye" size="md" color="success" variant="solid"
-              class="text-white rounded-full px-4 py-2 hover:bg-white hover:text-black transition duration-300"
-              @click="detayaGit(kullanici)"
-            />
-          </div>
+          </UDropdownMenu>
         </li>
       </ul>
     </div>
