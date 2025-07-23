@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import type { Todo } from '~/types'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTaskStore } from '~/stores/storage'
 
@@ -10,16 +11,12 @@ definePageMeta({
 const router = useRouter()
 const route = useRoute()
 const store = useTaskStore()
+const user = useUserStore()
 const toast = useToast()
 
 const yeniMetin = ref('')
 const bitisTarihi = ref('')
-const selected = ref<{ text: string, number: number } | undefined>(undefined)
-
-const gorev = computed(() => {
-  const id = Number(route.params.id)
-  return store.gorevler.find(g => g.id === id)
-})
+const selected = ref<number | undefined>(undefined)
 
 const severityList = [
   { text: 'Yüksek Öncelik', number: 10 },
@@ -27,39 +24,48 @@ const severityList = [
   { text: 'Düşük Öncelik', number: 30 },
 ]
 
-watch(gorev, (g) => {
-  if (process.client) {
-    if (g) {
-      document.title = `Görev: ${g.text}`
-      yeniMetin.value = g.text
-      bitisTarihi.value = g.endDate
-      selected.value = severityList.find(s => s.text === g.category)
-    }
-    else {
-      document.title = 'Görev Detay'
-    }
+const gorev = ref<Todo | undefined>()
+
+onMounted(() => {
+  store.loadFromStorage(Number(user.$id))
+  const id = Number(route.params.id)
+  const bulunan = store.gorevler.find(g => g.id === id)
+  gorev.value = bulunan
+
+  if (bulunan) {
+    document.title = `Görev: ${bulunan.text}`
+    yeniMetin.value = bulunan.text
+    bitisTarihi.value = bulunan.endDate
+    selected.value = severityList.find(s => s.text === bulunan.category)?.number
   }
-}, { immediate: true })
+  else {
+    document.title = 'Görev Detay'
+  }
+})
 
 function guncelleVeGeriDon() {
   if (!gorev.value)
     return
 
-  const index = store.gorevler.findIndex(g => g.id === gorev.value?.id)
-  if (index === -1)
-    return
+  const selectedCategory = severityList.find(s => s.number === selected.value)?.text || ''
 
-  store.gorevler[index].text = yeniMetin.value
-  store.gorevler[index].endDate = bitisTarihi.value
-  store.gorevler[index].category = selected.value?.text || ''
+  const guncellenmis: Todo = {
+    ...gorev.value,
+    text: yeniMetin.value,
+    endDate: bitisTarihi.value,
+    category: selectedCategory,
+  }
 
-  localStorage.setItem('gorevler', JSON.stringify(store.gorevler))
+  store.guncelle(guncellenmis)
+
+  toast.add({ title: 'Değişiklikler başarıyla kaydedildi.' })
   router.back()
 }
 </script>
 
 <template>
   <div class="flex justify-center items-center min-h-[calc(100vh-128px)] text-white px-4 py-8">
+    <h1>{{ gorev?.text }}</h1>
     <div class="w-full max-w-3xl p-6 rounded-lg shadow-lg bg-zinc-700">
       <h1 class="text-2xl font-bold mb-4">
         Görev Detay
@@ -93,9 +99,12 @@ function guncelleVeGeriDon() {
           <div class="mt-4">
             <label class="block mb-1 font-semibold">Bir Kategori Seç :</label>
             <USelectMenu
-              v-model?="selected" :search-input="false" value-key="number"
-              label-key="text" :items="severityList"
-              placeholder="Lütfen Bir Kategori Seçiniz : " class="bg-zinc-900 w-full px-2 py-2 rounded dark:text-white light:text-amber-50"
+              v-model="selected"
+              :items="severityList"
+              value-key="number"
+              label-key="text"
+              placeholder="Lütfen Bir Kategori Seçiniz"
+              class="bg-zinc-900 w-full px-2 py-2 rounded text-white"
             />
           </div>
         </div>
@@ -106,7 +115,7 @@ function guncelleVeGeriDon() {
             icon="i-lucide-refresh-ccw"
             label="Güncelle"
             variant="outline"
-            @click="guncelleVeGeriDon(), toast.add({ title: 'Değişiklikler Başarı İle Kaydedildi...' })"
+            @click="guncelleVeGeriDon"
           />
         </div>
       </div>

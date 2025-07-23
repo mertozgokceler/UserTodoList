@@ -8,19 +8,19 @@ const router = useRouter()
 const route = useRoute()
 const store = useTaskStore()
 const userStore = useUserStore()
-
+const userId = useUserStore()
 const silinecekGorev = ref<Todo | null>(null)
 const removeModalIsOpen = ref<boolean>(false)
 const toast = useToast()
-
 const id = Number(route.params.id)
 const user = computed(() =>
   userStore.kullanicilar.find(u => u.id === id),
 )
 
-onMounted(async () => {
+onMounted(() => {
+  store.loadFromStorage(Number(userId.$id))
   if (userStore.kullanicilar.length === 0)
-    await userStore.fetchUsers()
+    userStore.fetchUsers()
 })
 
 function todoDetayaGit(todo: Todo) {
@@ -29,7 +29,6 @@ function todoDetayaGit(todo: Todo) {
     params: { id: String(todo.id) },
   })
 }
-
 function silModalAc(todo: Todo) {
   silinecekGorev.value = todo
   removeModalIsOpen.value = true
@@ -68,8 +67,8 @@ function formatTarih(tarih: string): string {
     <div class="flex-1 w-full">
       <ul class="w-120">
         <li
-          v-for="(gorev, index) in store.gorevler"
-          :key="index"
+          v-for="gorev in store.gorevler"
+          :key="gorev.id"
           class="w-full flex justify-between items-center transition-all duration-300 bg-slate-400 text-black font-bold px-4 py-5 rounded mt-3 hover:shadow-lg hover:bg-purple-500 hover:scale-105"
         >
           <div class="flex items-center space-x-3">

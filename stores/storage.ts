@@ -5,6 +5,28 @@ import { ref } from 'vue'
 export const useTaskStore = defineStore('todo', () => {
   const gorevler = ref<Todo[]>([])
 
+  function loadFromStorage(userId: number) {
+    if (typeof window === 'undefined')
+      return
+    const stored = localStorage.getItem(`gorevler_${userId}`)
+    if (stored) {
+      try {
+        gorevler.value = JSON.parse(stored)
+      }
+      catch (e) {
+        console.error('Görevler çözümlenemedi:', e)
+      }
+    }
+  }
+
+  function guncelle(guncellenmisGorev: Todo) {
+    const index = gorevler.value.findIndex(g => g.id === guncellenmisGorev.id)
+    if (index !== -1) {
+      gorevler.value[index] = { ...guncellenmisGorev }
+      localStorage.setItem('gorevler', JSON.stringify(gorevler.value))
+    }
+  }
+
   function getNextId(): number {
     return gorevler.value.length ? Math.max(...gorevler.value.map(g => g.id)) + 1 : 0
   }
@@ -17,7 +39,6 @@ export const useTaskStore = defineStore('todo', () => {
       isCompleted: false,
       endDate: '',
       category: '',
-
     }
 
     gorevler.value.push(yeniGorev)
@@ -34,7 +55,7 @@ export const useTaskStore = defineStore('todo', () => {
     localStorage.setItem('gorevler', JSON.stringify(gorevler.value))
   }
 
-  return { gorevler, ekle, sil, deleteAll }
+  return { gorevler, ekle, sil, deleteAll, loadFromStorage, guncelle }
 })
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------

@@ -28,7 +28,6 @@ onMounted(async () => {
   const saved = localStorage.getItem(storageKey)
   store.gorevler = saved ? JSON.parse(saved) : []
 })
-
 watch(() => route.params.id, (newId) => {
   const newKey = `gorevler_${newId}`
   const saved = localStorage.getItem(newKey)
@@ -36,7 +35,7 @@ watch(() => route.params.id, (newId) => {
 })
 
 watch(() => store.gorevler, (newVal) => {
-  localStorage.setItem(storageKey, JSON.stringify(newVal))
+  localStorage.setItem(`gorevler_${id}`, JSON.stringify(newVal))
 }, { deep: true })
 </script>
 
